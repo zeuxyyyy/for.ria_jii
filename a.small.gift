@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOR RIYA jiii 🌹✨</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Georgia', serif;
+            cursor: crosshair;
+            background: #000;
+        }
+
+        /* Dark ethereal background */
+        #garden {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, 
+                #1a0033 0%, 
+                #0d001a 50%, 
+                #000000 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Optimized stars background */
+        #stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent);
+            background-size: 200% 200%;
+            animation: twinkle 8s ease-in-out infinite;
+            opacity: 0.5;
+            will-change: opacity;
+        }
+
+        /* Canvas for drawing roses */
+        #roseCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Welcome message */
+        #welcomeMessage {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(139, 0, 139, 0.4), rgba(75, 0, 130, 0.4));
+            padding: 20px 40px;
+            border-radius: 25px;
+            border: 2px solid rgba(255, 215, 255, 0.5);
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+            text-align: center;
+            z-index: 1000;
+            animation: heavenlyGlow 3s ease-in-out infinite;
+        }
+
+        #welcomeMessage h1 {
+            color: #FFD7FF;
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px #FF69B4, 0 0 20px #FF69B4;
+            letter-spacing: 2px;
+        }
+
+        #welcomeMessage p {
+            color: #FFC0CB;
+            font-size: 16px;
+            text-shadow: 0 0 5px rgba(255, 192, 203, 0.8);
+        }
+
+        /* Rose counter */
+        #roseCount {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, rgba(139, 0, 139, 0.3), rgba(75, 0, 130, 0.3));
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 18px;
+            color: #FFD7FF;
+            border: 2px solid rgba(255, 215, 255, 0.4);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+            z-index: 1000;
+            text-shadow: 0 0 10px #FF69B4;
+        }
+
+        /* Divine sparkle effect */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #fff, #FFD700);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkleFloat 4s ease-in-out infinite;
+            box-shadow: 0 0 8px #FFD700;
+            will-change: transform, opacity;
+        }
+
+        /* Click effect */
+        .click-ripple {
+            position: absolute;
+            border: 2px solid rgba(255, 105, 180, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes heavenlyGlow {
+            0%, 100% { 
+                box-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+            }
+            50% { 
+                box-shadow: 0 0 50px rgba(255, 105, 180, 0.8);
+            }
+        }
+
+        @keyframes sparkleFloat {
+            0%, 100% { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+            50% { 
+                transform: translateY(-20px) scale(1.3); 
+                opacity: 0.5; 
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 80px;
+                height: 80px;
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #welcomeMessage h1 { font-size: 20px; }
+            #welcomeMessage p { font-size: 14px; }
+            #roseCount { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="garden">
+        <!-- Starry background -->
+        <div id="stars"></div>
+
+        <!-- Welcome message -->
+        <div id="welcomeMessage">
+            <h1>✨ Some Roses for you RIYA jiii ✨</h1>
+            <p>Click anywhere to plant roses 🌹</p>
+        </div>
+
+        <!-- Rose counter -->
+        <div id="roseCount">Roses: <span id="count">1</span> 🌹</div>
+
+        <!-- Canvas for drawing 3D roses -->
+        <canvas id="roseCanvas"></canvas>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('roseCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Optimize for performance
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let roses = [];
+        let roseCount = 1;
+        let animationId;
+
+        // Optimized 3D Rose class
+        class Rose3D {
+            constructor(x, y, isSpecial = false) {
+                this.x = x;
+                this.y = y;
+                this.isSpecial = isSpecial;
+                this.size = isSpecial ? 45 : 25 + Math.random() * 15;
+                this.bloomProgress = 0;
+                this.swayOffset = Math.random() * Math.PI * 2;
+                this.swaySpeed = 0.001 + Math.random() * 0.001;
+                this.hovered = false;
+                this.glowIntensity = 0;
+                this.petalLayers = isSpecial ? 4 : 3;
+                this.hue = isSpecial ? 330 : 320 + Math.random() * 30;
+                this.rotation = 0;
+                this.cachedPetals = null;
+            }
+
+            update(time) {
+                // Bloom animation
+                if (this.bloomProgress < 1) {
+                    this.bloomProgress += 0.02;
+                }
+
+                // Gentle rotation
+                this.rotation = Math.sin(time * 0.0005) * 0.05;
+
+                // Glow for special rose
+                if (this.isSpecial) {
+                    this.glowIntensity = Math.sin(time * 0.001) * 0.3 + 0.5;
+                }
+            }
+
+            draw(ctx, time) {
+                ctx.save();
+
+                // Calculate sway (reduced complexity)
+                const sway = Math.sin(time * this.swaySpeed + this.swayOffset) * 3;
+                
+                // Translate to rose position
+                ctx.translate(this.x, this.y);
+
+                // Draw aura for special rose only
+                if (this.isSpecial && this.bloomProgress > 0.3) {
+                    const gradient = ctx.createRadialGradient(0, -this.size * 2.5, 0, 0, -this.size * 2.5, this.size * 2);
+                    gradient.addColorStop(0, `rgba(255, 105, 180, ${this.glowIntensity * 0.3})`);
+                    gradient.addColorStop(1, 'rgba(255, 105, 180, 0)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(-this.size * 2, -this.size * 4.5, this.size * 4, this.size * 4);
+                }
+
+                // Draw stem (simplified)
+                ctx.strokeStyle = `hsl(120, 50%, ${this.isSpecial ? 35 : 28}%)`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.quadraticCurveTo(sway * 2, -this.size * 1.5, sway, -this.size * 2.5);
+                ctx.stroke();
+
+                // Draw simplified leaves
+                this.drawLeaf(ctx, sway - 12, -this.size * 1.2, -0.4);
+                this.drawLeaf(ctx, sway + 12, -this.size * 1.8, 0.4);
+
+                // Move to rose head
+                ctx.translate(sway, -this.size * 2.5);
+                ctx.rotate(this.rotation);
+
+                // Scale for bloom
+                const scale = this.bloomProgress * (this.hovered ? 1.2 : 1);
+                ctx.scale(scale, scale);
+
+                // Draw 3D rose
+                this.draw3DRose(ctx, time);
+
+                ctx.restore();
+            }
+
+            drawLeaf(ctx, x, y, rotation) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(rotation);
+                
+                const gradient = ctx.createLinearGradient(-10, 0, 10, 0);
+                gradient.addColorStop(0, `hsl(120, 50%, 25%)`);
+                gradient.addColorStop(0.5, `hsl(120, 60%, 32%)`);
+                gradient.addColorStop(1, `hsl(120, 50%, 25%)`);
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 12, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            draw3DRose(ctx, time) {
+                // Set shadow for glow effect
+                if (this.isSpecial) {
+                    ctx.shadowBlur = 15 + this.glowIntensity * 10;
+                    ctx.shadowColor = `hsl(${this.hue}, 100%, 65%)`;
+                } else {
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = `hsl(${this.hue}, 100%, 55%)`;
+                }
+
+                // Draw petals in layers (optimized)
+                for (let layer = this.petalLayers; layer >= 0; layer--) {
+                    const layerSize = this.size * (0.4 + (layer / this.petalLayers) * 0.6);
+                    const petalsInLayer = 5 + Math.floor(layer * 0.5);
+                    const layerRotation = (layer % 2) * 0.15;
+                    const brightness = 45 + (layer / this.petalLayers) * 25;
+
+                    for (let i = 0; i < petalsInLayer; i++) {
+                        const angle = (Math.PI * 2 / petalsInLayer) * i + layerRotation;
+                        this.drawPetal(ctx, angle, layerSize, brightness);
+                    }
+                }
+
+                // Draw center
+                const centerGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size * 0.25);
+                centerGradient.addColorStop(0, `hsl(${this.hue + 15}, 100%, 75%)`);
+                centerGradient.addColorStop(0.6, `hsl(${this.hue}, 100%, 55%)`);
+                centerGradient.addColorStop(1, `hsl(${this.hue - 15}, 90%, 40%)`);
+                
+                ctx.fillStyle = centerGradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 0.25, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Center sparkle for special rose
+                if (this.isSpecial) {
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.glowIntensity * 0.8})`;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.08, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            drawPetal(ctx, angle, size, brightness) {
+                ctx.save();
+                ctx.rotate(angle);
+
+                // Simplified gradient for performance
+                const gradient = ctx.createRadialGradient(
+                    0, -size * 0.6, 0,
+                    0, -size * 0.6, size * 0.7
+                );
+                
+                gradient.addColorStop(0, `hsl(${this.hue}, 100%, ${brightness + 15}%)`);
+                gradient.addColorStop(0.5, `hsl(${this.hue}, 95%, ${brightness}%)`);
+                gradient.addColorStop(1, `hsl(${this.hue - 15}, 85%, ${brightness - 20}%)`);
+
+                ctx.fillStyle = gradient;
+                
+                // Simplified petal shape
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.quadraticCurveTo(size * 0.5, -size * 0.5, size * 0.3, -size * 0.9);
+                ctx.quadraticCurveTo(0, -size * 1.0, -size * 0.3, -size * 0.9);
+                ctx.quadraticCurveTo(-size * 0.5, -size * 0.5, 0, 0);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            isMouseOver(mouseX, mouseY) {
+                const dx = mouseX - this.x;
+                const dy = mouseY - (this.y - this.size * 2.5);
+                return Math.sqrt(dx * dx + dy * dy) < this.size * 1.2;
+            }
+        }
+
+        // Create special rose
+        function createSpecialRose() {
+            const specialRose = new Rose3D(canvas.width / 2, canvas.height * 0.6, true);
+            roses.push(specialRose);
+            createDivineSparkles(canvas.width / 2, canvas.height * 0.6);
+        }
+
+        // Create sparkles (limited amount)
+        function createDivineSparkles(x, y) {
+            for (let i = 0; i < 12; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                const angle = (Math.PI * 2 / 12) * i;
+                const distance = 60 + Math.random() * 40;
+                sparkle.style.left = (x + Math.cos(angle) * distance) + 'px';
+                sparkle.style.top = (y + Math.sin(angle) * distance - 100) + 'px';
+                sparkle.style.animationDelay = (i * 0.2) + 's';
+                document.getElementById('garden').appendChild(sparkle);
+            }
+        }
+
+        // Plant a rose
+        function plantRose(x, y) {
+            if (y > canvas.height - 100) return;
+            
+            // Limit total roses for performance
+            if (roses.length >= 30) {
+                roses.shift(); // Remove oldest rose
+            }
+
+            const rose = new Rose3D(x, y);
+            roses.push(rose);
+            roseCount++;
+            document.getElementById('count').textContent = roseCount;
+
+            createRipple(x, y);
+            playDivineSound();
+        }
+
+        // Create click ripple
+        function createRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.className = 'click-ripple';
+            ripple.style.left = (x - 40) + 'px';
+            ripple.style.top = (y - 40) + 'px';
+            document.getElementById('garden').appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        // Optimized sound
+        let audioContext = null;
+        function playDivineSound() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 528;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Optimized animation loop
+        let lastTime = 0;
+        function animate(currentTime) {
+            // Throttle to ~60fps
+            if (currentTime - lastTime < 16) {
+                animationId = requestAnimationFrame(animate);
+                return;
+            }
+            lastTime = currentTime;
+
+            // Clear with solid color (faster than transparency)
+            ctx.fillStyle = '#1a0033';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update and draw roses
+            roses.forEach(rose => {
+                rose.update(currentTime);
+                rose.draw(ctx, currentTime);
+            });
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Mouse move (throttled)
+        let mouseTimeout;
+        canvas.addEventListener('mousemove', (e) => {
+            if (mouseTimeout) return;
+            mouseTimeout = setTimeout(() => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                roses.forEach(rose => {
+                    rose.hovered = rose.isMouseOver(mouseX, mouseY);
+                });
+                mouseTimeout = null;
+            }, 50);
+        });
+
+        // Click to plant
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            plantRose(x, y);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Initialize
+        createSpecialRose();
+        animate(0);
+
+        // Fade welcome message
+        setTimeout(() => {
+            const welcomeMsg = document.getElementById('welcomeMessage');
+            welcomeMsg.style.transition = 'opacity 2s';
+            welcomeMsg.style.opacity = '0.7';
+        }, 5000);
+    </script>
+</body>
+  </html>
